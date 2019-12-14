@@ -52,11 +52,9 @@ defmodule Day02.IntMachine do
   end
 
   defp extract_operands(program, offset) do
-    operand1_pos = Enum.at(program, offset + 1)
+    [operand1_pos, operand2_pos, pos] = Enum.slice(program, offset + 1, 3)
     operand1 = Enum.at(program, operand1_pos)
-    operand2_pos = Enum.at(program, offset + 2)
     operand2 = Enum.at(program, operand2_pos)
-    pos = Enum.at(program, offset + 3)
     {operand1, operand2, pos}
   end
 
