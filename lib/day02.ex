@@ -14,8 +14,8 @@ defmodule Day02.IntMachine do
   def restore_gravity_assist(input) do
     input
     |> extract_program()
-    |> List.update_at(1, fn _value_before -> 12 end)
-    |> List.update_at(2, fn _value_before -> 2 end)
+    |> List.replace_at(1, 12)
+    |> List.replace_at(2, 2)
     |> to_str()
   end
 
