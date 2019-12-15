@@ -4,22 +4,22 @@ defmodule Day02.IntMachine do
   @op_code_mul 2
   @halt 99
 
-  def exec_program(input) do
-    input
-    |> extract_program()
+  def exec_program(program) when is_binary(program) do
+    program
+    |> extract()
     |> exec()
     |> to_str()
   end
 
-  def restore_gravity_assist(input) do
-    input
-    |> extract_program()
+  def restore_gravity_assist(program) when is_binary(program) do
+    program
+    |> extract()
     |> List.replace_at(1, 12)
     |> List.replace_at(2, 2)
     |> to_str()
   end
 
-  defp extract_program(input) do
+  defp extract(input) do
     input
       |> String.split(",")
       |> Enum.map(&String.to_integer/1)
@@ -27,35 +27,35 @@ defmodule Day02.IntMachine do
 
   defp to_str(program), do: Enum.join(program, ",")
 
-  defp exec(program, state \\ :continue, offset \\ 0)
+  defp exec(program, state \\ :continue, instruction_pointer \\ 0)
 
-  defp exec(program, :continue, offset) do
-    opcode = Enum.at(program, offset)
-    {new_state, new_program} = exec(opcode, program, offset)
-    exec(new_program, new_state, offset + 4)
+  defp exec(program, :continue, instruction_pointer) do
+    opcode = Enum.at(program, instruction_pointer)
+    {new_state, new_program} = exec(opcode, program, instruction_pointer)
+    exec(new_program, new_state, instruction_pointer + 4)
   end
 
-  defp exec(program, :halt, _offset), do: program
+  defp exec(program, :halt, _instruction_pointer), do: program
 
-  defp exec(@halt, program, _offset), do: {:halt, program}
+  defp exec(@halt, program, _instruction_pointer), do: {:halt, program}
 
-  defp exec(@op_code_sum, program, offset) do
-    {op1, op2, pos} = extract_operands(program, offset)
-    new_program = List.replace_at(program, pos, op1 + op2)
+  defp exec(@op_code_sum, program, instruction_pointer) do
+    {param1, param2, pos} = extract_parameters(program, instruction_pointer)
+    new_program = List.replace_at(program, pos, param1 + param2)
     {:continue, new_program}
   end
 
-  defp exec(@op_code_mul, program, offset) do
-    {op1, op2, pos} = extract_operands(program, offset)
-    new_program = List.replace_at(program, pos, op1 * op2)
+  defp exec(@op_code_mul, program, instruction_pointer) do
+    {param1, param2, pos} = extract_parameters(program, instruction_pointer)
+    new_program = List.replace_at(program, pos, param1 * param2)
     {:continue, new_program}
   end
 
-  defp extract_operands(program, offset) do
-    [operand1_pos, operand2_pos, pos] = Enum.slice(program, offset + 1, 3)
-    operand1 = Enum.at(program, operand1_pos)
-    operand2 = Enum.at(program, operand2_pos)
-    {operand1, operand2, pos}
+  defp extract_parameters(program, instruction_pointer) do
+    [param1_pos, param2_pos, pos] = Enum.slice(program, instruction_pointer + 1, 3)
+    param1 = Enum.at(program, param1_pos)
+    param2 = Enum.at(program, param2_pos)
+    {param1, param2, pos}
   end
 
 end
