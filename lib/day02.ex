@@ -11,7 +11,8 @@ defmodule Day02.IntMachine do
     |> exec()
   end
 
-  def find_nouns_and_verbs_for_return_code(program, return_code) when is_binary(program) and is_number(return_code) do
+  def find_nouns_and_verbs_for_return_code(program, return_code)
+      when is_binary(program) and is_number(return_code) do
     candidates = 0..99
 
     for noun <- candidates,
@@ -53,5 +54,4 @@ defmodule Day02.IntMachine do
     new_program = List.replace_at(program, pos, fn2.(param1, param2))
     {:continue, new_program}
   end
-
 end
