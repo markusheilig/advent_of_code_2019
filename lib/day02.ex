@@ -21,6 +21,7 @@ defmodule Day02.IntMachine do
 
   def find_nouns_and_verbs_for_value(program, value_to_look_for) do
     candidates = 0..99
+
     for noun <- candidates,
         verb <- candidates,
         program = restore(program, noun, verb),
@@ -30,7 +31,8 @@ defmodule Day02.IntMachine do
     end
   end
 
-  defp program_starts_with?(program, value), do: String.starts_with?(program, to_string(value) <> @separator)
+  defp program_starts_with?(program, value),
+    do: String.starts_with?(program, to_string(value) <> @separator)
 
   defp binary_to_program(input) do
     input

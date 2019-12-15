@@ -15,13 +15,14 @@ defmodule Day01.Spacecraft do
 
   def fuel_recursive(masses) when is_list(masses), do: sum(masses, &fuel_recursive/1)
   def fuel_recursive(mass) when is_number(mass), do: fuel_recursive(mass, _acc = 0)
+
   defp fuel_recursive(mass, acc) do
     fuel = fuel(mass)
+
     if fuel <= 0 do
       acc
     else
       fuel_recursive(fuel, acc + fuel)
     end
   end
-
 end
