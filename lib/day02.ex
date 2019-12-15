@@ -1,31 +1,44 @@
 defmodule Day02.IntMachine do
-
   @op_code_sum 1
   @op_code_mul 2
-  @halt 99
+  @op_code_halt 99
+  @separator ","
 
-  def exec_program(program) when is_binary(program) do
+  def execute(program) when is_binary(program) do
     program
-    |> extract()
+    |> binary_to_program()
     |> exec()
     |> to_str()
   end
 
-  def restore_gravity_assist(program) when is_binary(program) do
+  def restore(program, noun \\ 12, verb \\ 2) when is_binary(program) do
     program
-    |> extract()
-    |> List.replace_at(1, 12)
-    |> List.replace_at(2, 2)
+    |> binary_to_program()
+    |> List.replace_at(1, noun)
+    |> List.replace_at(2, verb)
     |> to_str()
   end
 
-  defp extract(input) do
-    input
-      |> String.split(",")
-      |> Enum.map(&String.to_integer/1)
+  def find_nouns_and_verbs_for_value(program, value_to_look_for) do
+    candidates = 0..99
+    for noun <- candidates,
+        verb <- candidates,
+        program = restore(program, noun, verb),
+        program = execute(program),
+        program_starts_with?(program, value_to_look_for) do
+      {noun, verb}
+    end
   end
 
-  defp to_str(program), do: Enum.join(program, ",")
+  defp program_starts_with?(program, value), do: String.starts_with?(program, to_string(value) <> @separator)
+
+  defp binary_to_program(input) do
+    input
+    |> String.split(@separator)
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  defp to_str(program), do: Enum.join(program, @separator)
 
   defp exec(program, state \\ :continue, instruction_pointer \\ 0)
 
@@ -37,7 +50,7 @@ defmodule Day02.IntMachine do
 
   defp exec(program, :halt, _instruction_pointer), do: program
 
-  defp exec(@halt, program, _instruction_pointer), do: {:halt, program}
+  defp exec(@op_code_halt, program, _instruction_pointer), do: {:halt, program}
 
   defp exec(@op_code_sum, program, instruction_pointer) do
     {param1, param2, pos} = extract_parameters(program, instruction_pointer)
@@ -57,5 +70,4 @@ defmodule Day02.IntMachine do
     param2 = Enum.at(program, param2_pos)
     {param1, param2, pos}
   end
-
 end
