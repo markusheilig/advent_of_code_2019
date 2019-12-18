@@ -6,57 +6,59 @@ defmodule Day03.Wire do
     wire1
     |> path()
     |> intersection(path(wire2))
-    |> map(&to_manhattan_distance/1)
+    |> map(&manhattan_distance/1)
     |> min()
   end
 
   def nearest_intersection_steps(wire1, wire2) do
-    path_wire1 = path(wire1)
-    path_wire2 = path(wire2)
+    path1 = path(wire1)
+    path2 = path(wire2)
 
-    distances =
-      for pos <- intersection(path_wire1, path_wire2) do
-        d1 = Map.get(path_wire1, pos)
-        d2 = Map.get(path_wire2, pos)
-        d1 + d2
-      end
-    Enum.min(distances)
+    intersection_steps =
+      for pos <- intersection(path1, path2) do
+        steps1 = Enum.find_index(path1, &(&1 == pos)) + 1
+        steps2 = Enum.find_index(path2, &(&1 == pos)) + 1
+        steps1 + steps2
+    end
+
+    Enum.min(intersection_steps)
   end
 
-  defp path(wire) do
+  def path(wire) do
+    wire
+    |> to_steps()
+    |> walk()
+  end
+
+  defp to_steps(wire) do
     wire
     |> String.split(",")
-    |> Enum.map(&to_steps/1)
-    |> Enum.reduce({_start_position = {0, 0}, _path = %{}}, &walk/2)
-    |> elem(1)
+    |> Enum.map(fn
+      "R" <> num -> {{1,0}, to_integer(num)}
+      "L" <> num -> {{-1, 0}, to_integer(num)}
+      "U" <> num -> {{0, 1}, to_integer(num)}
+      "D" <> num -> {{0, -1}, to_integer(num)}
+    end)
   end
 
-  defp to_steps("R" <> steps), do: {{1, 0}, to_integer(steps)}
-  defp to_steps("L" <> steps), do: {{-1, 0}, to_integer(steps)}
-  defp to_steps("U" <> steps), do: {{0, 1}, to_integer(steps)}
-  defp to_steps("D" <> steps), do: {{0, -1}, to_integer(steps)}
+  defp walk(way, pos \\ {0, 0}, path \\ [])
 
-  defp walk({direction, steps}, {position, path}) do
-    {x, y} = position
-    {d1, d2} = direction
+  defp walk(_steps = [], _pos, path), do: Enum.reverse(path)
 
-    new_path =
-      for step <- 1..steps, into: %{} do
-        coordinate = {x + d1 * step, y + d2 * step}
-        index = map_size(path) + step
-        {coordinate, index}
-      end
+  defp walk([{_direction, 0} | steps], pos, path), do: walk(steps, pos, path)
 
-    position = {x + d1 * steps, y + d2 * steps}
-    path = Map.merge(path, new_path)
-    {position, path}
+  defp walk([{direction, num} | steps], {x, y}, path) do
+    {dx, dy} = direction
+    pos = {x + dx, y + dy}
+    walk([{direction, num - 1} | steps], pos, [pos | path])
   end
 
-  defp to_manhattan_distance({x, y}), do: abs(x) + abs(y)
+  defp manhattan_distance({x, y}), do: abs(x) + abs(y)
 
-  defp intersection(xs, ys) do
-    xs = Map.keys(xs) |> MapSet.new()
-    ys = Map.keys(ys) |> MapSet.new()
-    MapSet.intersection(xs, ys)
+  defp intersection(path1, path2) do
+    coordinates1 = MapSet.new(path1)
+    coordinates2 = MapSet.new(path2)
+    MapSet.intersection(coordinates1, coordinates2)
   end
+
 end
