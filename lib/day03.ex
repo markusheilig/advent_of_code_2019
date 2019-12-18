@@ -19,7 +19,7 @@ defmodule Day03.Wire do
         steps1 = Enum.find_index(path1, &(&1 == pos)) + 1
         steps2 = Enum.find_index(path2, &(&1 == pos)) + 1
         steps1 + steps2
-    end
+      end
 
     Enum.min(intersection_steps)
   end
@@ -34,7 +34,7 @@ defmodule Day03.Wire do
     wire
     |> String.split(",")
     |> Enum.map(fn
-      "R" <> num -> {{1,0}, to_integer(num)}
+      "R" <> num -> {{1, 0}, to_integer(num)}
       "L" <> num -> {{-1, 0}, to_integer(num)}
       "U" <> num -> {{0, 1}, to_integer(num)}
       "D" <> num -> {{0, -1}, to_integer(num)}
@@ -60,5 +60,4 @@ defmodule Day03.Wire do
     coordinates2 = MapSet.new(path2)
     MapSet.intersection(coordinates1, coordinates2)
   end
-
 end
